@@ -58,6 +58,8 @@ class Board:
 
 # SETUP GAME
 
+# Player placement
+
 playerShipBoard = Board()
 
 def PlacementPrompt(name, size):
@@ -85,39 +87,24 @@ PlacementPrompt("Submarine", 3)
 PlacementPrompt("PT Boat", 2)
 
 
+# Computer placement
+
 oppShipBoard=Board()
 
 Horz = [True, False]
 
-PlacementError = True
-while PlacementError:
-  PlacementError = oppShipBoard.placeShip(random.randint(0,9),\
-                                      random.randint(0,9),\
-                                      random.choice(Horz),5)
+def oppPlacement(size):
+  PlacementError = True
+  while PlacementError:
+    PlacementError = oppShipBoard.placeShip(random.randint(0,9),\
+                                        random.randint(0,9),\
+                                        random.choice(Horz),size)
 
-PlacementError = True
-while PlacementError:
-  PlacementError = oppShipBoard.placeShip(random.randint(0,9),\
-                                      random.randint(0,9),\
-                                      random.choice(Horz),4)
-
-PlacementError = True
-while PlacementError:
-  PlacementError = oppShipBoard.placeShip(random.randint(0,9),\
-                                      random.randint(0,9),\
-                                      random.choice(Horz),3)
-
-PlacementError = True
-while PlacementError:
-  PlacementError = oppShipBoard.placeShip(random.randint(0,9),\
-                                      random.randint(0,9),\
-                                      random.choice(Horz),3)
-
-PlacementError = True
-while PlacementError:
-  PlacementError = oppShipBoard.placeShip(random.randint(0,9),\
-                                      random.randint(0,9),\
-                                      random.choice(Horz),2)
+oppPlacement(5)
+oppPlacement(4)
+oppPlacement(3)
+oppPlacement(3)
+oppPlacement(2)
 
 
 playerViewBoard = Board()
