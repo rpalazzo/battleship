@@ -1,7 +1,7 @@
 import random
 
 rowDict = {"A":0,"B":1,"C":2,"D":3,"E":4,"F":5,"G":6,"H":7,"I":8,"J":9}
-rowLable = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+rowLabel = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
 class Ship:
   def __init__(self, shipType):
@@ -40,7 +40,7 @@ class Board:
   def __str__(self):
     string = "  0 1 2 3 4 5 6 7 8 9\n"
     for i in range(0,10):
-      string += rowLable[i]
+      string += rowLabel[i]
       string += " "
       for j in range(0,10):
         string += self.matrix[i][j]
@@ -96,6 +96,11 @@ class Board:
 # Player placement
 
 playerShipBoard = Board()
+oppShipBoard = Board()
+playerViewBoard = Board()
+oppViewBoard = Board()
+
+
 print playerShipBoard
 
 def PlacementPrompt(ship):
@@ -122,15 +127,17 @@ playerDestroyer = Ship("Destroyer")
 playerSubmarine = Ship("Submarine")
 playerPtBoat = Ship("PT Boat")
 
-#PlacementPrompt(playerAircraftCarrier)
-#PlacementPrompt(playerBattleship)
-#PlacementPrompt(playerDestroyer)
-#PlacementPrompt(playerSubmarine)
-#PlacementPrompt(playerPtBoat)
+PlacementPrompt(playerAircraftCarrier)
+PlacementPrompt(playerBattleship)
+PlacementPrompt(playerDestroyer)
+PlacementPrompt(playerSubmarine)
+PlacementPrompt(playerPtBoat)
 
 # Computer placement
 
 oppShipBoard = Board()
+playerViewBoard = Board()
+oppViewBoard = Board()
 
 Horz = [True, False]
 
@@ -156,8 +163,7 @@ oppPlacement(oppPtBoat)
 #print oppShipBoard
 
 
-playerViewBoard = Board()
-oppViewBoard = Board()
+
 
 
 # PLAY GAME
@@ -194,15 +200,36 @@ def announceSinking():
     printYouSankMy(oppPtBoat)
 
 
+def computerTurn():
+
+  shot = 'x'
+  while shot == 'x' or shot == 'o':  #Previously targeted
+    randRow = random.randint(0,9)
+    randCol = random.randint(0,9)
+    shot = playerShipBoard.get(randRow, randCol)
+    if shot == '.':
+      result = "miss"
+    else:
+      result = "HIT"
+      
+  print "Oppenent shot at", rowLabel[randRow], randCol, ": ", result
+  if shot == '.':
+    playerShipBoard.set(randRow, randCol, 'o')
+  else:
+    playerShipBoard.set(randRow, randCol, 'x')
+
+     
+
 while numberOfHits < 17:
   print
   print playerViewBoard
+  print playerShipBoard
 
   targetRow = int(rowDict[raw_input("Row target letter: ").upper()])
   targetCol = int(input("Column target number: "))
 
   if playerViewBoard.get(targetRow, targetCol) != '.':
-    print "Coordinates", rowLable[targetRow], targetCol, "already targeted."
+    print "Coordinates", rowLabel[targetRow], targetCol, "already targeted."
   elif oppShipBoard.get(targetRow, targetCol) != '.':
     numberOfShots += 1
     numberOfHits += 1
@@ -211,7 +238,9 @@ while numberOfHits < 17:
     announceSinking()
   else:
     numberOfShots += 1
-    playerViewBoard.set(targetRow, targetCol, 'o')    
+    playerViewBoard.set(targetRow, targetCol, 'o')
+
+  computerTurn()
 
 print
 print playerViewBoard
