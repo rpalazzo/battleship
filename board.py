@@ -1,3 +1,6 @@
+
+rowLabel = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+
 class Board:
 
   def __init__(self):

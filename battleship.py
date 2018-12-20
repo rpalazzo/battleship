@@ -1,125 +1,18 @@
 import random
+from ship import Ship
+from board import Board
+from ai import AI
 
 rowDict = {"A":0,"B":1,"C":2,"D":3,"E":4,"F":5,"G":6,"H":7,"I":8,"J":9}
 rowLabel = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
-class Ship:
-  def __init__(self, shipType):
-    self.name = shipType
-    self.sunk = False
-    if shipType == "Aircraft Carrier":
-      self.size = 5
-      self.char = 'a'
-    elif shipType == "Battleship":
-      self.size = 4
-      self.char = 'b'
-    elif shipType == "Destroyer":
-      self.size = 3
-      self.char = 'd'
-    elif shipType == "Submarine":
-      self.size = 3
-      self.char = 's'
-    elif shipType == "PT Boat":
-      self.size = 2
-      self.char = 'p'
-    else:
-      self.size = 0
-      self.char = '.'
-
-  def isSunk(self):
-    return self.sunk
-
-  def sink(self):
-    self.sunk = True
-    
-class Board:
-
-  def __init__(self):
-    self.matrix = [["." for x in range(10)] for y in range(10)]
-  
-  def __str__(self):
-    string = "  0 1 2 3 4 5 6 7 8 9\n"
-    for i in range(0,10):
-      string += rowLabel[i]
-      string += " "
-      for j in range(0,10):
-        string += self.matrix[i][j]
-        string += " "
-      string += "\n"
-    return string   
-    
-  def get(self, row, column):
-    return self.matrix[row][column]
-
-  def set(self, row, column, value):
-    self.matrix[row][column] = value
-
-  def placeShip(self, row, column, isHorz, shipType):
-    error = False
-    #Check out of bounds
-    if isHorz:
-      if column + shipType.size > 10:
-        return True
-    else:
-      if row + shipType.size > 10:
-        return True
-
-    #Check for overlap  
-    for i in range(shipType.size):
-      if isHorz:
-        if self.matrix[row][column+i] != '.':
-          error = True
-          break
-      else:
-        if self.matrix[row+i][column] != '.':
-          error = True
-          break
-
-    #Add ships
-    if not error:
-      for i in range(shipType.size):    
-        if isHorz:
-          self.matrix[row][column+i] = shipType.char 
-        else:
-          self.matrix[row+i][column] = shipType.char
-    return error
-
-  def contains(self, char):
-    intermediateList = [False for x in range(10)] 
-    for x in range(10):
-      intermediateList[x] = char in self.matrix[x]
-    return True in intermediateList
-
 
 # SETUP GAME
 
-# Player placement
-
 playerShipBoard = Board()
-oppShipBoard = Board()
 playerViewBoard = Board()
-oppViewBoard = Board()
-
-
-print playerShipBoard
-
-def PlacementPrompt(ship):
-  PlacementError = True
-  while PlacementError:
-    print "Place your size", ship.size, ship.name
-    PromptRow = int(rowDict[raw_input("  Uppermost row letter: ").upper()])
-    PromptCol = int(input("  Leftmost column number: "))
-    Orientation = bool(input("  Vertical (0) or Horizontal (1): "))
-    PlacementError = playerShipBoard.placeShip(PromptRow, PromptCol, \
-                                               Orientation, ship)
-    if PlacementError:
-      print
-      print "   ### PLACEMENT ERROR!  Try again. ###"
-      print
-    else:
-      print
-      print playerShipBoard
-      print
+computerShipBoard = Board()
+computerViewBoard = Board()
 
 playerAircraftCarrier = Ship("Aircraft Carrier")
 playerBattleship = Ship("Battleship")
@@ -127,77 +20,91 @@ playerDestroyer = Ship("Destroyer")
 playerSubmarine = Ship("Submarine")
 playerPtBoat = Ship("PT Boat")
 
+computerAircraftCarrier = Ship("Aircraft Carrier")
+computerBattleship = Ship("Battleship")
+computerDestroyer = Ship("Destroyer")
+computerSubmarine = Ship("Submarine")
+computerPtBoat = Ship("PT Boat")
+
+
+# Player placement
+
+print(playerShipBoard)
+
+def PlacementPrompt(ship):
+  PlacementError = True
+  while PlacementError:
+    print("Place your size", ship.size, ship.name)
+    PromptRow = int(rowDict[input("  Uppermost row letter: ").upper()])
+    PromptCol = int(input("  Leftmost column number: "))
+    Orientation = int(input("  Vertical (0) or Horizontal (1): "))
+    if Orientation == 1:
+      isHorz = True
+    else:
+      isHorz = False
+    PlacementError = playerShipBoard.placeShip(PromptRow, PromptCol,
+                                               isHorz, ship)
+    if PlacementError:
+      notify(" PLACEMENT ERROR!  Try again.")
+    else:
+      print(playerShipBoard)
+
 PlacementPrompt(playerAircraftCarrier)
 PlacementPrompt(playerBattleship)
 PlacementPrompt(playerDestroyer)
 PlacementPrompt(playerSubmarine)
 PlacementPrompt(playerPtBoat)
 
+
 # Computer placement
 
-oppShipBoard = Board()
-playerViewBoard = Board()
-oppViewBoard = Board()
 
-Horz = [True, False]
-
-def oppPlacement(ship):
+def computerPlacement(ship):
+  Horz = [True, False]
   PlacementError = True
   while PlacementError:
-    PlacementError = oppShipBoard.placeShip(random.randint(0,9),\
-                                        random.randint(0,9),\
-                                        random.choice(Horz),ship)
+    PlacementError = computerShipBoard.placeShip(random.randint(0,9),
+                                                 random.randint(0,9),
+                                                 random.choice(Horz),ship)
 
-oppAircraftCarrier = Ship("Aircraft Carrier")
-oppBattleship = Ship("Battleship")
-oppDestroyer = Ship("Destroyer")
-oppSubmarine = Ship("Submarine")
-oppPtBoat = Ship("PT Boat")
+computerPlacement(computerAircraftCarrier)
+computerPlacement(computerBattleship)
+computerPlacement(computerDestroyer)
+computerPlacement(computerSubmarine)
+computerPlacement(computerPtBoat)
 
-oppPlacement(oppAircraftCarrier)
-oppPlacement(oppBattleship)
-oppPlacement(oppDestroyer)
-oppPlacement(oppSubmarine)
-oppPlacement(oppPtBoat)
-
-#print oppShipBoard
-
-
+#print computerShipBoard #used for debugging
 
 
 
 # PLAY GAME
 
-print
-print "   Starting game, fire at will!"
-print
+print("\n   Starting game, fire at will!\n")
 
 numberOfShots = 0
 numberOfHits = 0
 
-def printYouSankMy(ship):
-    print ""
-    print "**********************************"
-    print "* You sank my", ship.name, "!"
-    print "**********************************"
-    print ""  
+def notify(msg):
+    print("\n**********************************")
+    print("* ", msg, "!")
+    print("**********************************\n")
 
 def announceSinking():
-  if not(oppShipBoard.contains('a')) and not(oppAircraftCarrier.isSunk()):
-    oppAircraftCarrier.sink()
-    printYouSankMy(oppAircraftCarrier)
-  if not(oppShipBoard.contains('b')) and not(oppBattleship.isSunk()):
-    oppBattleship.sink()
-    printYouSankMy(oppBattleship)
-  if not(oppShipBoard.contains('d')) and not(oppDestroyer.isSunk()):
-    oppDestroyer.sink()
-    printYouSankMy(oppDestroyer)
-  if not(oppShipBoard.contains('s')) and not(oppSubmarine.isSunk()):
-    oppSubmarine.sink()
-    printYouSankMy(oppSubmarine)
-  if not(oppShipBoard.contains('p')) and not(oppPtBoat.isSunk()):
-    oppPtBoat.sink()
-    printYouSankMy(oppPtBoat)
+  if not(computerShipBoard.contains('a')) and not(computerAircraftCarrier.isSunk()):
+    computerAircraftCarrier.sink()
+    notify(computerAircraftCarrier)
+  if not(computerShipBoard.contains('b')) and not(computerBattleship.isSunk()):
+    computerBattleship.sink()
+    notify(computerBattleship)
+  if not(computerShipBoard.contains('d')) and not(computerDestroyer.isSunk()):
+    computerDestroyer.sink()
+    notify(computerDestroyer)
+  if not(computerShipBoard.contains('s')) and not(computerSubmarine.isSunk()):
+    computerSubmarine.sink()
+    notify(computerSubmarine)
+  if not(computerShipBoard.contains('p')) and not(computerPtBoat.isSunk()):
+    computerPtBoat.sink()
+    notify(computerPtBoat)
 
 
 def computerTurn():
@@ -211,8 +118,8 @@ def computerTurn():
       result = "miss"
     else:
       result = "HIT"
-      
-  print "Oppenent shot at", rowLabel[randRow], randCol, ": ", result
+
+  print("Computer shot at", rowLabel[randRow], randCol, ": ", result)
   if shot == '.':
     playerShipBoard.set(randRow, randCol, 'o')
   else:
@@ -221,20 +128,20 @@ def computerTurn():
      
 
 while numberOfHits < 17:
-  print
-  print playerViewBoard
-  print playerShipBoard
+  print()
+  print(playerViewBoard)
+  print(playerShipBoard)
 
-  targetRow = int(rowDict[raw_input("Row target letter: ").upper()])
+  targetRow = int(rowDict[input("Row target letter: ").upper()])
   targetCol = int(input("Column target number: "))
 
   if playerViewBoard.get(targetRow, targetCol) != '.':
-    print "Coordinates", rowLabel[targetRow], targetCol, "already targeted."
-  elif oppShipBoard.get(targetRow, targetCol) != '.':
+    print("Coordinates", rowLabel[targetRow], targetCol, "already targeted.")
+  elif computerShipBoard.get(targetRow, targetCol) != '.':
     numberOfShots += 1
     numberOfHits += 1
     playerViewBoard.set(targetRow, targetCol, 'x')
-    oppShipBoard.set(targetRow, targetCol, 'x')
+    computerShipBoard.set(targetRow, targetCol, 'x')
     announceSinking()
   else:
     numberOfShots += 1
@@ -242,7 +149,7 @@ while numberOfHits < 17:
 
   computerTurn()
 
-print
-print playerViewBoard
-print "You took", numberOfShots, "shots."
+print()
+print(playerViewBoard)
+print("You took", numberOfShots, "shots.")
 
